@@ -7,19 +7,13 @@
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Leaflet MarkerCluster CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
     
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         }
         
@@ -28,339 +22,220 @@
             width: 100%;
         }
         
+        /* Header */
         .header {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 20px;
+            left: 60px;
+            right: 20px;
+            z-index: 1000;
             background: white;
             padding: 15px 20px;
+            border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
         
         .header h1 {
-            font-size: 24px;
+            margin: 0;
+            font-size: 1.5rem;
             color: #1e40af;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
         
-        .filters {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .filter-select {
-            padding: 8px 15px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .alert-list {
-            position: absolute;
-            top: 80px;
-            left: 20px;
-            width: 350px;
-            max-height: calc(100vh - 100px);
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            z-index: 999;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .alert-list-header {
-            padding: 15px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e5e7eb;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .alert-list-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-        
-        .alert-item {
-            padding: 12px;
-            margin-bottom: 8px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .alert-item:hover {
-            border-color: #3b82f6;
-            background: #f0f9ff;
-        }
-        
-        .alert-item.selected {
-            border-color: #3b82f6;
-            background: #dbeafe;
-        }
-        
-        .alert-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 5px;
-        }
-        
-        .severity-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        
-        .severity-extreme { background: #dc2626; }
-        .severity-severe { background: #ea580c; }
-        .severity-moderate { background: #facc15; }
-        .severity-minor { background: #22c55e; }
-        
-        .alert-title {
-            font-weight: 600;
-            font-size: 14px;
-            color: #1f2937;
-        }
-        
-        .alert-event {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 3px;
-        }
-        
-        .alert-location {
-            font-size: 11px;
-            color: #9ca3af;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .legend {
-            position: absolute;
-            bottom: 30px;
-            right: 20px;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 999;
-        }
-        
-        .legend-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 5px;
-            font-size: 13px;
-        }
-        
-        .custom-popup {
-            max-width: 300px;
-        }
-        
-        .popup-header {
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 10px;
-            color: #1f2937;
-        }
-        
-        .popup-content {
-            font-size: 14px;
-            color: #4b5563;
-        }
-        
-        .popup-instruction {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 8px;
-            margin-top: 10px;
-            font-size: 13px;
-        }
-        
-        .popup-footer {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #e5e7eb;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-        
+        /* Stats Bar */
         .stats-bar {
             position: absolute;
-            top: 80px;
-            right: 20px;
+            bottom: 20px;
+            left: 60px;
+            z-index: 1000;
             background: white;
             padding: 15px 20px;
-            border-radius: 8px;
+            border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 999;
             display: flex;
             gap: 20px;
         }
         
         .stat-item {
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .stat-value {
-            font-size: 24px;
+        .stat-badge {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        /* Alert List */
+        .alert-list {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            width: 350px;
+            max-height: 60vh;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .alert-list-header {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
             font-weight: bold;
+            position: sticky;
+            top: 0;
+            background: white;
         }
         
-        .stat-label {
-            font-size: 11px;
-            color: #6b7280;
-            text-transform: uppercase;
+        .alert-item {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: background 0.2s;
         }
         
+        .alert-item:hover {
+            background: #f3f4f6;
+        }
+        
+        .severity-extreme { border-left: 4px solid #ef4444; }
+        .severity-severe { border-left: 4px solid #f97316; }
+        .severity-moderate { border-left: 4px solid #eab308; }
+        .severity-minor { border-left: 4px solid #22c55e; }
+        
+        /* Toggle Button */
+        .toggle-list {
+            position: absolute;
+            top: 100px;
+            right: 380px;
+            z-index: 1000;
+        }
+        
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 3px rgba(0,0,0,0.3);
+        }
+        
+        /* Loading */
         .loading {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 1001;
+            z-index: 2000;
+            background: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+            display: none;
         }
         
-        .spinner {
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+        .loading.active {
+            display: block;
         }
         
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
         
-        .toggle-list {
-            position: absolute;
-            top: 90px;
-            left: 380px;
-            background: white;
-            padding: 8px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 999;
-            cursor: pointer;
-        }
-        
-        .alert-list.hidden {
-            transform: translateX(-380px);
-            transition: transform 0.3s;
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
         }
     </style>
 </head>
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>
-            <span>🗺️</span>
-            Mapa de Alertas - Defesa Civil SC
-        </h1>
-        <div class="filters">
-            <select id="severityFilter" class="filter-select">
-                <option value="all">Todas Severidades</option>
-                <option value="extreme">🔴 Extremo</option>
-                <option value="severe">🟠 Severo</option>
-                <option value="moderate">🟡 Moderado</option>
-                <option value="minor">🟢 Menor</option>
-            </select>
-            <select id="categoryFilter" class="filter-select">
-                <option value="all">Todas Categorias</option>
-                <option value="Met">☁️ Meteorológico</option>
-                <option value="Hydro">💧 Hidrológico</option>
-                <option value="Geo">⛰️ Geológico</option>
-            </select>
-            <button id="refreshBtn" class="filter-select">
-                🔄 Atualizar
-            </button>
+        <h1>🗺️ Mapa de Alertas - Defesa Civil SC</h1>
+        <div>
+            <span id="lastUpdate">Atualizado: --:--</span>
         </div>
     </div>
     
     <!-- Estatísticas -->
     <div class="stats-bar">
         <div class="stat-item">
-            <div class="stat-value" style="color: #dc2626" id="statExtreme">0</div>
-            <div class="stat-label">Extremo</div>
+            <div class="stat-badge" style="background: #ef4444;"></div>
+            <span>Extremo: <strong id="countExtreme">0</strong></span>
         </div>
         <div class="stat-item">
-            <div class="stat-value" style="color: #ea580c" id="statSevere">0</div>
-            <div class="stat-label">Severo</div>
+            <div class="stat-badge" style="background: #f97316;"></div>
+            <span>Severo: <strong id="countSevere">0</strong></span>
         </div>
         <div class="stat-item">
-            <div class="stat-value" style="color: #facc15" id="statModerate">0</div>
-            <div class="stat-label">Moderado</div>
+            <div class="stat-badge" style="background: #eab308;"></div>
+            <span>Moderado: <strong id="countModerate">0</strong></span>
         </div>
         <div class="stat-item">
-            <div class="stat-value" style="color: #22c55e" id="statMinor">0</div>
-            <div class="stat-label">Menor</div>
+            <div class="stat-badge" style="background: #22c55e;"></div>
+            <span>Menor: <strong id="countMinor">0</strong></span>
         </div>
     </div>
+    
+    <!-- Toggle Lista -->
+    <button class="toggle-list" id="toggleList" onclick="toggleAlertList()">📋</button>
     
     <!-- Lista de Alertas -->
     <div class="alert-list" id="alertList">
         <div class="alert-list-header">
-            <span>Alertas Ativos</span>
-            <span id="alertCount">0</span>
+            Alertas Ativos (<span id="alertCount">0</span>)
         </div>
-        <div class="alert-list-content" id="alertListContent">
+        <div id="alertListContent">
             <!-- Alertas serão inseridos aqui -->
         </div>
     </div>
     
-    <!-- Botão Toggle Lista -->
-    <div class="toggle-list" id="toggleList">
-        📋
-    </div>
-    
     <!-- Legenda -->
     <div class="legend">
-        <div class="legend-title">Legenda</div>
+        <strong>Legenda</strong>
         <div class="legend-item">
-            <div class="severity-dot severity-extreme"></div>
+            <div class="legend-color" style="background: #ef4444;"></div>
             <span>Extremo</span>
         </div>
         <div class="legend-item">
-            <div class="severity-dot severity-severe"></div>
+            <div class="legend-color" style="background: #f97316;"></div>
             <span>Severo</span>
         </div>
         <div class="legend-item">
-            <div class="severity-dot severity-moderate"></div>
+            <div class="legend-color" style="background: #eab308;"></div>
             <span>Moderado</span>
         </div>
         <div class="legend-item">
-            <div class="severity-dot severity-minor"></div>
+            <div class="legend-color" style="background: #22c55e;"></div>
             <span>Menor</span>
         </div>
     </div>
@@ -368,7 +243,7 @@
     <!-- Loading -->
     <div class="loading" id="loading">
         <div class="spinner"></div>
-        <div>Carregando mapa...</div>
+        <div>Carregando alertas...</div>
     </div>
     
     <!-- Mapa -->
@@ -379,225 +254,172 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     
     <script>
-        // Configuração
+        // Configuração Supabase - DECLARE APENAS UMA VEZ
         const SUPABASE_URL = 'https://glcmokypzpibrtcwwbng.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsY21va3lwenBpYnJ0Y3d3Ym5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NzQyNzYsImV4cCI6MjA3MDI1MDI3Nn0.Ka3H0nPurr_rcALJa61C_JblM69PAXMba79S0fhLFEk';
-        
-        // Coordenadas dos municípios
-        const MUNICIPIOS = {
-            'Florianópolis': [-27.5954, -48.5480],
-            'Joinville': [-26.3044, -48.8487],
-            'Blumenau': [-26.9194, -49.0661],
-            'São José': [-27.6136, -48.6097],
-            'Chapecó': [-27.1009, -52.6156],
-            'Itajaí': [-26.9078, -48.6619],
-            'Criciúma': [-28.6778, -49.3700],
-            'Jaraguá do Sul': [-26.4863, -49.0857],
-            'Lages': [-27.8161, -50.3261],
-            'Palhoça': [-27.6456, -48.6679],
-            'Balneário Camboriú': [-26.9906, -48.6347],
-            'Brusque': [-27.0977, -48.9177],
-            'Tubarão': [-28.4667, -49.0069],
-            'São Bento do Sul': [-26.2500, -49.3789],
-            'Caçador': [-26.7750, -51.0150],
-            'Concórdia': [-27.2342, -52.0278],
-            'Camboriú': [-27.0247, -48.6542],
-            'Navegantes': [-26.8989, -48.6539],
-            'Araranguá': [-28.9347, -49.4858],
-            'Gaspar': [-26.9314, -48.9586],
-            'Biguaçu': [-27.4943, -48.6556],
-            'Indaial': [-26.8978, -49.2317],
-            'Mafra': [-26.1114, -49.8053],
-            'Canoinhas': [-26.1772, -50.3900]
-        };
-        
-        let map;
-        let markers = [];
-        let markerCluster;
-        let alerts = [];
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsY21va3lwenBpYnJ0Y3d3Ym5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NzQyNzYsImV4cCI6MjA3MDI1MDI3Nn0.Ka3H0nPurr_rcALJa61C_JblM69PAXMba79S0fhLFEk';
         
         // Inicializar mapa
-        function initMap() {
-            map = L.map('map').setView([-27.2092, -49.6401], 7);
-            
-            // Adicionar tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors | Defesa Civil SC'
-            }).addTo(map);
-            
-            // Criar cluster group
-            markerCluster = L.markerClusterGroup({
-                maxClusterRadius: 50,
-                spiderfyOnMaxZoom: true,
-                showCoverageOnHover: false,
-                zoomToBoundsOnClick: true
-            });
-            
-            map.addLayer(markerCluster);
-        }
+        const map = L.map('map').setView([-27.2423, -50.2189], 7);
         
-        // Buscar alertas
-        async function fetchAlerts() {
+        // Adicionar tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Cluster de marcadores
+        const markerCluster = L.markerClusterGroup();
+        map.addLayer(markerCluster);
+        
+        // Array para armazenar marcadores
+        let markers = [];
+        let alertsData = [];
+        
+        // Função para buscar alertas
+        async function fetchActiveAlerts() {
+            showLoading(true);
+            
             try {
                 const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/alerts?select=*,alert_areas(*)&is_active=eq.true`,
+                    `${SUPABASE_URL}/rest/v1/alerts?is_active=eq.true&select=*,alert_areas(*)`,
                     {
                         headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                         }
                     }
                 );
                 
-                const data = await response.json();
-                alerts = processAlerts(data);
-                updateMap();
-                updateList();
-                updateStats();
+                if (!response.ok) throw new Error('Erro ao buscar dados');
                 
-                document.getElementById('loading').style.display = 'none';
+                const alerts = await response.json();
+                alertsData = alerts;
+                
+                updateMap(alerts);
+                updateStats(alerts);
+                updateAlertList(alerts);
+                updateLastUpdate();
+                
             } catch (error) {
-                console.error('Erro ao buscar alertas:', error);
-                document.getElementById('loading').style.display = 'none';
+                console.error('Erro:', error);
+                // Usar dados mock se falhar
+                useMockData();
+            } finally {
+                showLoading(false);
             }
         }
         
-        // Processar alertas e adicionar coordenadas
-        function processAlerts(data) {
-            return data.map(alert => {
-                const areas = alert.alert_areas || [];
-                let coords = null;
-                
-                // Tentar encontrar coordenadas
-                for (const area of areas) {
-                    for (const [municipio, coord] of Object.entries(MUNICIPIOS)) {
-                        if (area.area_desc?.includes(municipio) || municipio.includes(area.area_desc || '')) {
-                            coords = coord;
-                            break;
-                        }
-                    }
-                    if (coords) break;
-                }
-                
-                // Se não encontrou, usar centro de SC com pequeno offset aleatório
-                if (!coords) {
-                    coords = [
-                        -27.2092 + (Math.random() - 0.5) * 2,
-                        -49.6401 + (Math.random() - 0.5) * 2
-                    ];
-                }
-                
-                return {
-                    ...alert,
-                    coordinates: coords,
-                    affectedAreas: areas.map(a => a.area_desc).filter(Boolean)
-                };
-            });
-        }
-        
         // Atualizar mapa
-        function updateMap() {
-            // Limpar marcadores anteriores
+        function updateMap(alerts) {
+            // Limpar marcadores antigos
             markerCluster.clearLayers();
             markers = [];
             
-            // Filtros
-            const severityFilter = document.getElementById('severityFilter').value;
-            const categoryFilter = document.getElementById('categoryFilter').value;
-            
-            // Adicionar novos marcadores
             alerts.forEach(alert => {
-                // Aplicar filtros
-                if (severityFilter !== 'all' && alert.severity?.toLowerCase() !== severityFilter) return;
-                if (categoryFilter !== 'all' && alert.category !== categoryFilter) return;
-                
-                const icon = createIcon(alert.severity);
-                const marker = L.marker(alert.coordinates, { icon });
-                
-                // Popup
-                const popupContent = createPopupContent(alert);
-                marker.bindPopup(popupContent);
-                
-                // Eventos
-                marker.on('click', () => selectAlert(alert));
-                
-                markers.push({ marker, alert });
-                markerCluster.addLayer(marker);
+                const coords = getAlertCoordinates(alert);
+                if (coords) {
+                    const marker = createMarker(alert, coords);
+                    markers.push(marker);
+                    markerCluster.addLayer(marker);
+                }
             });
         }
         
-        // Criar ícone personalizado
-        function createIcon(severity) {
-            const colors = {
-                extreme: '#dc2626',
-                severe: '#ea580c',
-                moderate: '#facc15',
-                minor: '#22c55e'
-            };
+        // Criar marcador
+        function createMarker(alert, coords) {
+            const color = getSeverityColor(alert.severity);
             
-            const color = colors[severity?.toLowerCase()] || '#6b7280';
-            
-            return L.divIcon({
-                html: `<div style="background: ${color}; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
-                className: 'custom-marker',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
+            const marker = L.circleMarker(coords, {
+                radius: 12,
+                fillColor: color,
+                color: '#fff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
             });
+            
+            marker.bindPopup(createPopupContent(alert));
+            return marker;
         }
         
-        // Criar conteúdo do popup
+        // Conteúdo do popup
         function createPopupContent(alert) {
             return `
-                <div class="custom-popup">
-                    <div class="popup-header">${alert.headline || 'Alerta'}</div>
-                    <div class="popup-content">
-                        <p><strong>Severidade:</strong> ${alert.severity || 'N/A'}</p>
-                        <p><strong>Evento:</strong> ${alert.event || 'N/A'}</p>
-                        <p>${alert.description || ''}</p>
-                        ${alert.instruction ? `
-                            <div class="popup-instruction">
-                                <strong>⚠️ Instruções:</strong><br>
-                                ${alert.instruction}
-                            </div>
-                        ` : ''}
-                    </div>
-                    <div class="popup-footer">
-                        Expira: ${alert.expires_time ? new Date(alert.expires_time).toLocaleString('pt-BR') : 'N/A'}
-                    </div>
+                <div style="max-width: 300px;">
+                    <h3 style="margin: 0 0 10px 0; color: #1e40af;">
+                        ${alert.headline || 'Alerta'}
+                    </h3>
+                    <p><strong>🔴 Severidade:</strong> ${alert.severity || 'N/A'}</p>
+                    <p><strong>⚠️ Evento:</strong> ${alert.event || 'N/A'}</p>
+                    <p><strong>📝 Descrição:</strong> ${alert.description || 'Sem descrição'}</p>
+                    ${alert.instruction ? `<p><strong>📢 Instruções:</strong> ${alert.instruction}</p>` : ''}
+                    <p><strong>📍 Áreas:</strong> ${alert.alert_areas?.map(a => a.area_desc).join(', ') || 'N/A'}</p>
+                    <p><strong>⏰ Expira:</strong> ${alert.expires_time ? new Date(alert.expires_time).toLocaleString('pt-BR') : 'N/A'}</p>
                 </div>
             `;
         }
         
-        // Atualizar lista
-        function updateList() {
-            const container = document.getElementById('alertListContent');
-            const severityFilter = document.getElementById('severityFilter').value;
-            const categoryFilter = document.getElementById('categoryFilter').value;
+        // Obter coordenadas
+        function getAlertCoordinates(alert) {
+            // Coordenadas dos municípios de SC
+            const municipios = {
+                'Florianópolis': [-27.5954, -48.5480],
+                'Joinville': [-26.3044, -48.8487],
+                'Blumenau': [-26.9194, -49.0661],
+                'São José': [-27.6147, -48.6356],
+                'Chapecó': [-27.0964, -52.6319],
+                'Criciúma': [-28.6778, -49.3697],
+                'Itajaí': [-26.9078, -48.6619],
+                'Lages': [-27.8161, -50.3264],
+                'Jaraguá do Sul': [-26.4863, -49.0658],
+                'Palhoça': [-27.6456, -48.6678],
+                'Balneário Camboriú': [-26.9906, -48.6347],
+                'São Bento do Sul': [-26.2503, -49.3789],
+                'Caçador': [-26.7764, -51.0150],
+                'Concórdia': [-27.2347, -52.0278],
+                'Grande Florianópolis': [-27.5954, -48.5480],
+                'Vale do Itajaí': [-26.9194, -49.0661],
+                'Norte do Estado': [-26.3044, -48.8487],
+                'Sul do Estado': [-28.6778, -49.3697],
+                'Oeste do Estado': [-27.0964, -52.6319],
+                'Planalto Norte': [-26.3751, -50.2106],
+                'Santa Catarina': [-27.2423, -50.2189]
+            };
             
-            const filteredAlerts = alerts.filter(alert => {
-                if (severityFilter !== 'all' && alert.severity?.toLowerCase() !== severityFilter) return false;
-                if (categoryFilter !== 'all' && alert.category !== categoryFilter) return false;
-                return true;
-            });
+            // Tentar encontrar município na área
+            if (alert.alert_areas && alert.alert_areas.length > 0) {
+                const area = alert.alert_areas[0].area_desc;
+                
+                for (const [nome, coords] of Object.entries(municipios)) {
+                    if (area && area.toLowerCase().includes(nome.toLowerCase())) {
+                        // Adicionar pequena variação para evitar sobreposição
+                        return [
+                            coords[0] + (Math.random() - 0.5) * 0.1,
+                            coords[1] + (Math.random() - 0.5) * 0.1
+                        ];
+                    }
+                }
+            }
             
-            document.getElementById('alertCount').textContent = filteredAlerts.length;
-            
-            container.innerHTML = filteredAlerts.map(alert => `
-                <div class="alert-item" onclick="selectAlert('${alert.id}')">
-                    <div class="alert-header">
-                        <div class="severity-dot severity-${(alert.severity || 'minor').toLowerCase()}"></div>
-                        <div class="alert-title">${alert.headline || 'Alerta'}</div>
-                    </div>
-                    <div class="alert-event">${alert.event || ''}</div>
-                    <div class="alert-location">
-                        📍 ${alert.affectedAreas?.join(', ') || 'Santa Catarina'}
-                    </div>
-                </div>
-            `).join('');
+            // Retornar coordenada aleatória em SC se não encontrar
+            return [
+                -27.2423 + (Math.random() - 0.5) * 3,
+                -50.2189 + (Math.random() - 0.5) * 4
+            ];
+        }
+        
+        // Obter cor por severidade
+        function getSeverityColor(severity) {
+            const colors = {
+                'Extreme': '#ef4444',
+                'Severe': '#f97316',
+                'Moderate': '#eab308',
+                'Minor': '#22c55e'
+            };
+            return colors[severity] || '#6b7280';
         }
         
         // Atualizar estatísticas
-        function updateStats() {
+        function updateStats(alerts) {
             const stats = {
                 extreme: 0,
                 severe: 0,
@@ -606,68 +428,121 @@
             };
             
             alerts.forEach(alert => {
-                const severity = (alert.severity || 'minor').toLowerCase();
-                if (stats[severity] !== undefined) {
-                    stats[severity]++;
-                }
+                const severity = (alert.severity || 'Minor').toLowerCase();
+                if (severity === 'extreme') stats.extreme++;
+                else if (severity === 'severe') stats.severe++;
+                else if (severity === 'moderate') stats.moderate++;
+                else stats.minor++;
             });
             
-            document.getElementById('statExtreme').textContent = stats.extreme;
-            document.getElementById('statSevere').textContent = stats.severe;
-            document.getElementById('statModerate').textContent = stats.moderate;
-            document.getElementById('statMinor').textContent = stats.minor;
+            document.getElementById('countExtreme').textContent = stats.extreme;
+            document.getElementById('countSevere').textContent = stats.severe;
+            document.getElementById('countModerate').textContent = stats.moderate;
+            document.getElementById('countMinor').textContent = stats.minor;
+            document.getElementById('alertCount').textContent = alerts.length;
         }
         
-        // Selecionar alerta
-        function selectAlert(alertOrId) {
-            const alert = typeof alertOrId === 'string' 
-                ? alerts.find(a => a.id === alertOrId)
-                : alertOrId;
-                
-            if (!alert) return;
+        // Atualizar lista de alertas
+        function updateAlertList(alerts) {
+            const listContent = document.getElementById('alertListContent');
+            listContent.innerHTML = '';
             
-            // Centralizar no mapa
-            map.setView(alert.coordinates, 10);
-            
-            // Abrir popup
-            const marker = markers.find(m => m.alert.id === alert.id);
-            if (marker) {
-                marker.marker.openPopup();
+            if (alerts.length === 0) {
+                listContent.innerHTML = '<div class="alert-item">Nenhum alerta ativo</div>';
+                return;
             }
             
-            // Destacar na lista
-            document.querySelectorAll('.alert-item').forEach((item, index) => {
-                if (alerts[index]?.id === alert.id) {
-                    item.classList.add('selected');
-                } else {
-                    item.classList.remove('selected');
-                }
+            alerts.forEach(alert => {
+                const item = document.createElement('div');
+                item.className = `alert-item severity-${(alert.severity || 'minor').toLowerCase()}`;
+                item.innerHTML = `
+                    <strong>${alert.headline || 'Alerta'}</strong><br>
+                    <small>${alert.event || 'Evento'}</small><br>
+                    <small>📍 ${alert.alert_areas?.map(a => a.area_desc).join(', ') || 'N/A'}</small>
+                `;
+                
+                item.onclick = () => {
+                    const coords = getAlertCoordinates(alert);
+                    if (coords) {
+                        map.setView(coords, 10);
+                        // Encontrar e abrir popup do marcador
+                        markers.forEach(marker => {
+                            const latlng = marker.getLatLng();
+                            if (Math.abs(latlng.lat - coords[0]) < 0.01 && 
+                                Math.abs(latlng.lng - coords[1]) < 0.01) {
+                                marker.openPopup();
+                            }
+                        });
+                    }
+                };
+                
+                listContent.appendChild(item);
             });
         }
         
-        // Event listeners
-        document.getElementById('severityFilter').addEventListener('change', () => {
-            updateMap();
-            updateList();
-        });
+        // Toggle lista de alertas
+        function toggleAlertList() {
+            const list = document.getElementById('alertList');
+            list.style.display = list.style.display === 'none' ? 'block' : 'none';
+        }
         
-        document.getElementById('categoryFilter').addEventListener('change', () => {
-            updateMap();
-            updateList();
-        });
+        // Atualizar última atualização
+        function updateLastUpdate() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = 
+                `Atualizado: ${now.toLocaleTimeString('pt-BR')}`;
+        }
         
-        document.getElementById('refreshBtn').addEventListener('click', fetchAlerts);
+        // Mostrar/esconder loading
+        function showLoading(show) {
+            document.getElementById('loading').className = show ? 'loading active' : 'loading';
+        }
         
-        document.getElementById('toggleList').addEventListener('click', () => {
-            document.getElementById('alertList').classList.toggle('hidden');
-        });
+        // Dados mock para teste
+        function useMockData() {
+            const mockAlerts = [
+                {
+                    id: 1,
+                    headline: 'Temporal com Vendaval',
+                    event: 'Condições Meteorológicas Adversas',
+                    severity: 'Severe',
+                    description: 'Rajadas de vento que podem superar 80 km/h',
+                    instruction: 'Evite áreas abertas e proteja-se',
+                    alert_areas: [{ area_desc: 'Grande Florianópolis' }],
+                    expires_time: new Date(Date.now() + 86400000).toISOString()
+                },
+                {
+                    id: 2,
+                    headline: 'Chuvas Intensas',
+                    event: 'Precipitação Elevada',
+                    severity: 'Moderate',
+                    description: 'Acumulado de até 60mm em 24h',
+                    alert_areas: [{ area_desc: 'Norte do Estado' }],
+                    expires_time: new Date(Date.now() + 43200000).toISOString()
+                },
+                {
+                    id: 3,
+                    headline: 'Risco de Deslizamento',
+                    event: 'Instabilidade Geológica',
+                    severity: 'Extreme',
+                    description: 'Solo saturado com risco elevado',
+                    instruction: 'Evacue áreas de risco imediatamente',
+                    alert_areas: [{ area_desc: 'Blumenau' }],
+                    expires_time: new Date(Date.now() + 21600000).toISOString()
+                }
+            ];
+            
+            updateMap(mockAlerts);
+            updateStats(mockAlerts);
+            updateAlertList(mockAlerts);
+            updateLastUpdate();
+        }
         
         // Inicializar
-        initMap();
-        fetchAlerts();
+        fetchActiveAlerts();
         
-        // Auto-refresh a cada 30 segundos
-        setInterval(fetchAlerts, 30000);
+        // Atualizar a cada 30 segundos
+        setInterval(fetchActiveAlerts, 30000);
     </script>
 </body>
 </html>
