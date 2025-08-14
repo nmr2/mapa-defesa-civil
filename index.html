@@ -276,11 +276,11 @@
         
         // Função para buscar alertas
        // Função para buscar alertas - VERSÃO CORRIGIDA
+// Função para buscar apenas alertas VIGENTES
 async function fetchActiveAlerts() {
     showLoading(true);
     
     try {
-        // Buscar apenas alertas, sem join com alert_areas
         const response = await fetch(
             `${SUPABASE_URL}/rest/v1/alerts`,
             {
@@ -291,30 +291,45 @@ async function fetchActiveAlerts() {
             }
         );
         
-        console.log('Response status:', response.status);
-        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const alerts = await response.json();
-        console.log('Alertas recebidos do banco:', alerts);
+        const allAlerts = await response.json();
+        console.log('Total de alertas no banco:', allAlerts.length);
         
-        // Adicionar áreas manualmente baseado no headline
-        const alertsWithAreas = alerts.map(alert => {
-            // Adicionar área baseada no headline ou descrição
+        // FILTRAR APENAS ALERTAS VIGENTES
+        const now = new Date();
+        const activeAlerts = allAlerts.filter(alert => {
+            // Verificar se tem data de expiração
+            if (!alert.expires_time) {
+                return true; // Se não tem data, considera ativo
+            }
+            
+            // Verificar se ainda não expirou
+            const expiresDate = new Date(alert.expires_time);
+            return expiresDate > now;
+        });
+        
+        console.log('Alertas vigentes (não expirados):', activeAlerts.length);
+        
+        // Adicionar áreas baseado no headline
+        const alertsWithAreas = activeAlerts.map(alert => {
             if (!alert.alert_areas) {
                 alert.alert_areas = [];
                 
                 if (alert.headline) {
-                    if (alert.headline.includes('Florianópolis')) {
-                        alert.alert_areas.push({ area_desc: 'Grande Florianópolis' });
-                    } else if (alert.headline.includes('Vale do Itajaí') || alert.headline.includes('Itajaí')) {
-                        alert.alert_areas.push({ area_desc: 'Vale do Itajaí' });
-                    } else if (alert.headline.includes('Blumenau')) {
+                    // Extrair município do headline
+                    const headline = alert.headline.toLowerCase();
+                    
+                    if (headline.includes('papanduva')) {
+                        alert.alert_areas.push({ area_desc: 'Papanduva' });
+                    } else if (headline.includes('florianópolis')) {
+                        alert.alert_areas.push({ area_desc: 'Florianópolis' });
+                    } else if (headline.includes('joinville')) {
+                        alert.alert_areas.push({ area_desc: 'Joinville' });
+                    } else if (headline.includes('blumenau')) {
                         alert.alert_areas.push({ area_desc: 'Blumenau' });
-                    } else if (alert.headline.includes('Norte')) {
-                        alert.alert_areas.push({ area_desc: 'Norte do Estado' });
                     } else {
                         alert.alert_areas.push({ area_desc: 'Santa Catarina' });
                     }
@@ -324,15 +339,22 @@ async function fetchActiveAlerts() {
         });
         
         if (alertsWithAreas.length > 0) {
-            console.log('Usando dados reais:', alertsWithAreas.length, 'alertas');
+            console.log('Mostrando', alertsWithAreas.length, 'alertas vigentes');
             alertsData = alertsWithAreas;
             updateMap(alertsWithAreas);
             updateStats(alertsWithAreas);
             updateAlertList(alertsWithAreas);
             updateLastUpdate();
         } else {
-            console.log('Nenhum alerta no banco, usando mock');
-            useMockData();
+            console.log('Nenhum alerta vigente no momento');
+            // Mostrar mensagem em vez de dados mock
+            const listContent = document.getElementById('alertListContent');
+            if (listContent) {
+                listContent.innerHTML = '<div class="alert-item">Nenhum alerta vigente no momento</div>';
+            }
+            // Limpar mapa
+            markerCluster.clearLayers();
+            document.getElementById('alertCount').textContent = '0';
         }
         
     } catch (error) {
