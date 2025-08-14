@@ -275,38 +275,73 @@
         let alertsData = [];
         
         // Função para buscar alertas
-        async function fetchActiveAlerts() {
-            showLoading(true);
-            
-            try {
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/alerts?is_active=eq.true&select=*,alert_areas(*)`,
-                    {
-                        headers: {
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                        }
-                    }
-                );
-                
-                if (!response.ok) throw new Error('Erro ao buscar dados');
-                
-                const alerts = await response.json();
-                alertsData = alerts;
-                
-                updateMap(alerts);
-                updateStats(alerts);
-                updateAlertList(alerts);
-                updateLastUpdate();
-                
-            } catch (error) {
-                console.error('Erro:', error);
-                // Usar dados mock se falhar
-                useMockData();
-            } finally {
-                showLoading(false);
+       // Função para buscar alertas - VERSÃO CORRIGIDA
+async function fetchActiveAlerts() {
+    showLoading(true);
+    
+    try {
+        // Buscar apenas alertas, sem join com alert_areas
+        const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/alerts`,
+            {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
             }
+        );
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const alerts = await response.json();
+        console.log('Alertas recebidos do banco:', alerts);
+        
+        // Adicionar áreas manualmente baseado no headline
+        const alertsWithAreas = alerts.map(alert => {
+            // Adicionar área baseada no headline ou descrição
+            if (!alert.alert_areas) {
+                alert.alert_areas = [];
+                
+                if (alert.headline) {
+                    if (alert.headline.includes('Florianópolis')) {
+                        alert.alert_areas.push({ area_desc: 'Grande Florianópolis' });
+                    } else if (alert.headline.includes('Vale do Itajaí') || alert.headline.includes('Itajaí')) {
+                        alert.alert_areas.push({ area_desc: 'Vale do Itajaí' });
+                    } else if (alert.headline.includes('Blumenau')) {
+                        alert.alert_areas.push({ area_desc: 'Blumenau' });
+                    } else if (alert.headline.includes('Norte')) {
+                        alert.alert_areas.push({ area_desc: 'Norte do Estado' });
+                    } else {
+                        alert.alert_areas.push({ area_desc: 'Santa Catarina' });
+                    }
+                }
+            }
+            return alert;
+        });
+        
+        if (alertsWithAreas.length > 0) {
+            console.log('Usando dados reais:', alertsWithAreas.length, 'alertas');
+            alertsData = alertsWithAreas;
+            updateMap(alertsWithAreas);
+            updateStats(alertsWithAreas);
+            updateAlertList(alertsWithAreas);
+            updateLastUpdate();
+        } else {
+            console.log('Nenhum alerta no banco, usando mock');
+            useMockData();
+        }
+        
+    } catch (error) {
+        console.error('Erro ao buscar alertas:', error);
+        useMockData();
+    } finally {
+        showLoading(false);
+    }
+}
         
         // Atualizar mapa
         function updateMap(alerts) {
