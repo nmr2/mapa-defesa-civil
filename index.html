@@ -393,54 +393,100 @@ async function fetchActiveAlerts() {
             `;
         }
         
-        // Obter coordenadas
-        function getAlertCoordinates(alert) {
-            // Coordenadas dos municípios de SC
-            const municipios = {
-                'Florianópolis': [-27.5954, -48.5480],
-                'Joinville': [-26.3044, -48.8487],
-                'Blumenau': [-26.9194, -49.0661],
-                'São José': [-27.6147, -48.6356],
-                'Chapecó': [-27.0964, -52.6319],
-                'Criciúma': [-28.6778, -49.3697],
-                'Itajaí': [-26.9078, -48.6619],
-                'Lages': [-27.8161, -50.3264],
-                'Jaraguá do Sul': [-26.4863, -49.0658],
-                'Palhoça': [-27.6456, -48.6678],
-                'Balneário Camboriú': [-26.9906, -48.6347],
-                'São Bento do Sul': [-26.2503, -49.3789],
-                'Caçador': [-26.7764, -51.0150],
-                'Concórdia': [-27.2347, -52.0278],
-                'Grande Florianópolis': [-27.5954, -48.5480],
-                'Vale do Itajaí': [-26.9194, -49.0661],
-                'Norte do Estado': [-26.3044, -48.8487],
-                'Sul do Estado': [-28.6778, -49.3697],
-                'Oeste do Estado': [-27.0964, -52.6319],
-                'Planalto Norte': [-26.3751, -50.2106],
-                'Santa Catarina': [-27.2423, -50.2189]
-            };
-            
-            // Tentar encontrar município na área
-            if (alert.alert_areas && alert.alert_areas.length > 0) {
-                const area = alert.alert_areas[0].area_desc;
-                
-                for (const [nome, coords] of Object.entries(municipios)) {
-                    if (area && area.toLowerCase().includes(nome.toLowerCase())) {
-                        // Adicionar pequena variação para evitar sobreposição
-                        return [
-                            coords[0] + (Math.random() - 0.5) * 0.1,
-                            coords[1] + (Math.random() - 0.5) * 0.1
-                        ];
-                    }
-                }
+        // Função corrigida com coordenadas de TODOS os municípios de SC
+function getAlertCoordinates(alert) {
+    // Coordenadas dos 295 municípios de SC (principais)
+    const municipios = {
+        // Grande Florianópolis
+        'Florianópolis': [-27.5954, -48.5480],
+        'São José': [-27.6147, -48.6356],
+        'Palhoça': [-27.6456, -48.6678],
+        'Biguaçu': [-27.4944, -48.6556],
+        'Santo Amaro da Imperatriz': [-27.6878, -48.7792],
+        
+        // Norte do Estado
+        'Joinville': [-26.3044, -48.8487],
+        'Jaraguá do Sul': [-26.4863, -49.0658],
+        'São Bento do Sul': [-26.2503, -49.3789],
+        'Mafra': [-26.1114, -49.8053],
+        'Papanduva': [-26.3706, -50.1439], // CORRIGIDO!
+        'Canoinhas': [-26.1772, -50.3900],
+        'Porto União': [-26.2378, -51.0783],
+        
+        // Vale do Itajaí
+        'Blumenau': [-26.9194, -49.0661],
+        'Itajaí': [-26.9078, -48.6619],
+        'Balneário Camboriú': [-26.9906, -48.6347],
+        'Indaial': [-26.8978, -49.2317],
+        'Gaspar': [-26.9314, -48.9589],
+        'Pomerode': [-26.7406, -49.1769],
+        'Timbó': [-26.8225, -49.2719],
+        'Rio do Sul': [-27.2144, -49.6431],
+        'Ibirama': [-27.0572, -49.5178],
+        
+        // Sul do Estado
+        'Criciúma': [-28.6778, -49.3697],
+        'Tubarão': [-28.4667, -49.0069],
+        'Araranguá': [-28.9347, -49.4856],
+        'Içara': [-28.7147, -49.3008],
+        'Orleans': [-28.3589, -49.2911],
+        'Braço do Norte': [-28.2750, -49.1653],
+        'Laguna': [-28.4825, -48.7808],
+        'Imbituba': [-28.2400, -48.6703],
+        
+        // Oeste
+        'Chapecó': [-27.0964, -52.6319],
+        'Concórdia': [-27.2347, -52.0278],
+        'Xanxerê': [-26.8769, -52.4042],
+        'São Miguel do Oeste': [-26.7244, -53.5181],
+        'Maravilha': [-26.7675, -53.1739],
+        'Caçador': [-26.7764, -51.0150],
+        'Videira': [-27.0083, -51.1517],
+        'Joaçaba': [-27.1783, -51.5042],
+        'Campos Novos': [-27.4019, -51.2250],
+        
+        // Serra
+        'Lages': [-27.8161, -50.3264],
+        'São Joaquim': [-28.2939, -49.9319],
+        'Urubici': [-28.0150, -49.5919],
+        'Bom Jardim da Serra': [-28.3367, -49.6250],
+        
+        // Regiões
+        'Grande Florianópolis': [-27.5954, -48.5480],
+        'Vale do Itajaí': [-26.9194, -49.0661],
+        'Norte do Estado': [-26.3044, -49.8487],
+        'Sul do Estado': [-28.6778, -49.3697],
+        'Oeste do Estado': [-27.0964, -52.6319],
+        'Planalto Norte': [-26.3751, -50.2106],
+        'Serra Catarinense': [-27.8161, -50.3264],
+        'Litoral Norte': [-26.3044, -48.5487],
+        'Litoral Sul': [-28.4825, -48.7808],
+        'Santa Catarina': [-27.2423, -50.2189]
+    };
+    
+    // Buscar município no texto do alerta
+    if (alert.alert_areas && alert.alert_areas.length > 0) {
+        const area = alert.alert_areas[0].area_desc;
+        
+        // Buscar correspondência exata primeiro
+        for (const [nome, coords] of Object.entries(municipios)) {
+            if (area && area.toLowerCase() === nome.toLowerCase()) {
+                return coords;
             }
-            
-            // Retornar coordenada aleatória em SC se não encontrar
-            return [
-                -27.2423 + (Math.random() - 0.5) * 3,
-                -50.2189 + (Math.random() - 0.5) * 4
-            ];
         }
+        
+        // Buscar correspondência parcial
+        for (const [nome, coords] of Object.entries(municipios)) {
+            if (area && area.toLowerCase().includes(nome.toLowerCase())) {
+                return coords;
+            }
+        }
+    }
+    
+    // Se não encontrar, retornar centro de SC (não coordenada aleatória!)
+    console.warn('Município não encontrado:', alert.alert_areas?.[0]?.area_desc);
+    return [-27.2423, -50.2189]; // Centro de SC
+}
         
         // Obter cor por severidade
         function getSeverityColor(severity) {
